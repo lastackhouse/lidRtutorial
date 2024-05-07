@@ -27,15 +27,15 @@ options(lidR.progress = FALSE)
 
 ## People
 
-**Presenter:** Tristan Goodbody (UBC)
+**Presenter:** Leanna Stackhouse (UBC)
 
 **Assistants:**
 
--   Alexandre Morin-Bernard (Laval)
+-   Hana Travers-Smith (UBC)
 
--   Leanna Stackhouse (UBC)
+-   Fatemah Gholami (Laval)
 
--   Liam Irwin (UBC)
+-   Claire Armour (CFS)
 
 ## Materials
 

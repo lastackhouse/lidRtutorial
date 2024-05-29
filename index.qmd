@@ -1,8 +1,8 @@
 ---
 title: "`lidR`: (A workshop for) Airborne LiDAR Data Manipulation and Visualization for Forestry Applications"
-author: "Tristan R.H. Goodbody, Jean-Romain Roussel"
+author: "Tristan R.H. Goodbody, Jean-Romain Roussel, Leanna Stackhouse, Claire Armour"
 institute: "University of British Columbia, Université Laval, Ministère des Forêts, de la Faune et des Parcs (Québec)"
-date: 2023-09-05
+date: 2024-09-10
 ---
 
 ```{r, echo = FALSE}
@@ -74,16 +74,15 @@ install.packages(libs)
 
 -   Introduction and set-up (09:00)
 -   Read LAS and LAZ files (09:15)
--   Spatial queries (09:35)
--   Area-Based Approach (09:45)
--   Canopy Height Model (10:00)
--   Digital Terrain Model (10:10)
+-   Digital Terrain Modelv (09:30)
+-   Canopy Height Model (09:45)
 
 --- Break until 10:30 ---
 
 -   Individual tree segmentation (10:30)
--   File collection processing engine (basic) (11:00)
--   File collection processing engine (advanced) (11:30)
+-   Area Based Approach (11:00)
+-   ABA Case Study (11:20)
+-   File collection processing engine (basic & advanced) (11:30)
 
 ## Resources
 

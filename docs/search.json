@@ -605,8 +605,8 @@
     "objectID": "index.html#people",
     "href": "index.html#people",
     "title": "lidR: (A workshop for) Airborne LiDAR Data Manipulation and Visualization for Forestry Applications",
-    "section": "People",
-    "text": "People\nPresenter: Tristan Goodbody (UBC)\nAssistants:\n\nAlexandre Morin-Bernard (Laval)\nLeanna Stackhouse (UBC)\nLiam Irwin (UBC)"
+    "section": "",
+    "text": "Presenter: Leanna Stackhouse (UBC)\nAssistants:\n\nHana Travers-Smith (UBC)\nFatemah Gholami (Laval)\nClaire Armour (CFS)"
   },
   {
     "objectID": "index.html#materials",
@@ -620,14 +620,14 @@
     "href": "index.html#requirements",
     "title": "lidR: (A workshop for) Airborne LiDAR Data Manipulation and Visualization for Forestry Applications",
     "section": "Requirements",
-    "text": "Requirements\n\nR version and Rstudio\n\nYou need to install a recent version of R i.e. R 4.0.x or newer.\nWe will work with Rstudio. This IDE is not mandatory to follow the workshop but is highly recommended.\n\n\n\nR Packages\nYou need to install the lidR package in its latest version (v >= 4.0.0).\ninstall.packages(\"lidR\")\nTo run all code in the tutorial yourself, you will need to install the following packages. You can use lidR without them, however.\nlibs <- c(\"geometry\",\"viridis\",\"future\",\"sf\",\"gstat\",\"terra\",\"mapview\",\"mapedit\",\"concaveman\",\"microbenchmark\")\n\ninstall.packages(libs)"
+    "text": "Requirements\n\nR version and Rstudio\n\nYou need to install a recent version of R i.e. R 4.0.x or newer.\nWe will work with Rstudio. This IDE is not mandatory to follow the workshop but is highly recommended.\n\n\n\nR Packages\nYou need to install the lidR package in its latest version (v &gt;= 4.0.0).\ninstall.packages(\"lidR\")\nTo run all code in the tutorial yourself, you will need to install the following packages. You can use lidR without them, however.\nlibs &lt;- c(\"geometry\",\"viridis\",\"future\",\"sf\",\"gstat\",\"terra\",\"mapview\",\"mapedit\",\"concaveman\",\"microbenchmark\")\n\ninstall.packages(libs)"
   },
   {
     "objectID": "index.html#estimated-schedule",
     "href": "index.html#estimated-schedule",
     "title": "lidR: (A workshop for) Airborne LiDAR Data Manipulation and Visualization for Forestry Applications",
     "section": "Estimated schedule",
-    "text": "Estimated schedule\n\nIntroduction and set-up (09:00)\nRead LAS and LAZ files (09:15)\nSpatial queries (09:35)\nArea-Based Approach (09:45)\nCanopy Height Model (10:00)\nDigital Terrain Model (10:10)\n\n— Break until 10:30 —\n\nIndividual tree segmentation (10:30)\nFile collection processing engine (basic) (11:00)\nFile collection processing engine (advanced) (11:30)"
+    "text": "Estimated schedule\n\nIntroduction and set-up (09:00)\nRead LAS and LAZ files (09:15)\nDigital Terrain Modelv (09:30)\nCanopy Height Model (09:45)\n\n— Break until 10:30 —\n\nIndividual tree segmentation (10:30)\nArea Based Approach (11:00)\nABA Case Study (11:20)\nFile collection processing engine (basic & advanced) (11:30)"
   },
   {
     "objectID": "index.html#resources",
@@ -642,5 +642,250 @@
     "title": "lidR: (A workshop for) Airborne LiDAR Data Manipulation and Visualization for Forestry Applications",
     "section": "lidR",
     "text": "lidR\nlidR is an R package to work with LiDAR data developed at Laval University (Québec). It was developed & continues to be maintained by Jean-Romain Roussel and was made possible between:\n\n2015 and 2018 thanks to the financial support of the AWARE project NSERC CRDPJ 462973-14; grantee Prof. Nicholas C. Coops.\n2018 and 2021 thanks to the financial support of the Ministère des Forêts, de la Faune et des Parcs (Québec).\n\nThe current release version of lidR can be found on CRAN and source code is hosted on GitHub."
+  },
+  {
+    "objectID": "06_aba.html",
+    "href": "06_aba.html",
+    "title": "Area Based Approach",
+    "section": "",
+    "text": "Code\nlidRbook metrics section\nlidRbook modelling section"
+  },
+  {
+    "objectID": "06_aba.html#relevant-resources",
+    "href": "06_aba.html#relevant-resources",
+    "title": "Area Based Approach",
+    "section": "",
+    "text": "Code\nlidRbook metrics section\nlidRbook modelling section"
+  },
+  {
+    "objectID": "06_aba.html#overview",
+    "href": "06_aba.html#overview",
+    "title": "Area Based Approach",
+    "section": "Overview",
+    "text": "Overview\nThis code demonstrates an example of the area-based approach for LiDAR data. Basic usage involves computing mean and max height of points within 10x10 m pixels and visualizing the results. The code shows how to compute multiple metrics simultaneously and use predefined metric sets. Advanced usage introduces user-defined metrics for more specialized calculations."
+  },
+  {
+    "objectID": "06_aba.html#environment",
+    "href": "06_aba.html#environment",
+    "title": "Area Based Approach",
+    "section": "Environment",
+    "text": "Environment\n\n# Clear environment\nrm(list = ls(globalenv()))\n\n# Load package\nlibrary(lidR)\nlibrary(sf)"
+  },
+  {
+    "objectID": "06_aba.html#basic-usage",
+    "href": "06_aba.html#basic-usage",
+    "title": "Area Based Approach",
+    "section": "Basic Usage",
+    "text": "Basic Usage\nWe’ll cover the basic usage of the lidR package to compute metrics from LiDAR data.\n\n# Load LiDAR data, excluding withheld flag points\nlas &lt;- readLAS(files = \"data/MixedEucaNat_normalized.laz\", select = \"*\",  filter = \"-set_withheld_flag 0\")\n\nThe pixel_metrics() function calculates structural metrics within a defined spatial resolution (res).\n\n# Compute the mean height of points within 10x10 m pixels\nhmean &lt;- pixel_metrics(las = las, func = ~mean(Z), res = 10)\nhmean\n#&gt; class       : SpatRaster \n#&gt; dimensions  : 15, 15, 1  (nrow, ncol, nlyr)\n#&gt; resolution  : 10, 10  (x, y)\n#&gt; extent      : 203830, 203980, 7358900, 7359050  (xmin, xmax, ymin, ymax)\n#&gt; coord. ref. : SIRGAS 2000 / UTM zone 23S (EPSG:31983) \n#&gt; source(s)   : memory\n#&gt; name        :           V1 \n#&gt; min value   :  0.001065319 \n#&gt; max value   : 17.730712824\nplot(hmean, col = height.colors(50))\n\n\n\n\n\n\n\n\n\n# Compute the max height of points within 10x10 m pixels\nhmax &lt;- pixel_metrics(las = las, func = ~max(Z), res = 10)\nhmax\n#&gt; class       : SpatRaster \n#&gt; dimensions  : 15, 15, 1  (nrow, ncol, nlyr)\n#&gt; resolution  : 10, 10  (x, y)\n#&gt; extent      : 203830, 203980, 7358900, 7359050  (xmin, xmax, ymin, ymax)\n#&gt; coord. ref. : SIRGAS 2000 / UTM zone 23S (EPSG:31983) \n#&gt; source(s)   : memory\n#&gt; name        :    V1 \n#&gt; min value   :  0.75 \n#&gt; max value   : 34.46\nplot(hmax, col = height.colors(50))\n\n\n\n\n\n\n\n\nYou can specify that multiple metrics should be calculated by housing them in a list().\n\n# Compute several metrics at once using a list\nmetrics &lt;- pixel_metrics(las = las, func = ~list(hmax = max(Z), hmean = mean(Z)), res = 10)\nmetrics\n#&gt; class       : SpatRaster \n#&gt; dimensions  : 15, 15, 2  (nrow, ncol, nlyr)\n#&gt; resolution  : 10, 10  (x, y)\n#&gt; extent      : 203830, 203980, 7358900, 7359050  (xmin, xmax, ymin, ymax)\n#&gt; coord. ref. : SIRGAS 2000 / UTM zone 23S (EPSG:31983) \n#&gt; source(s)   : memory\n#&gt; names       :  hmax,        hmean \n#&gt; min values  :  0.75,  0.001065319 \n#&gt; max values  : 34.46, 17.730712824\nplot(metrics, col = height.colors(50))\n\n\n\n\n\n\n\n\nPre-defined metric sets are available, such as .stdmetrics_z. See more here.\n\n# Simplify computing metrics with predefined sets of metrics\nmetrics &lt;- pixel_metrics(las = las, func = .stdmetrics_z, res = 10)\nmetrics\n#&gt; class       : SpatRaster \n#&gt; dimensions  : 15, 15, 36  (nrow, ncol, nlyr)\n#&gt; resolution  : 10, 10  (x, y)\n#&gt; extent      : 203830, 203980, 7358900, 7359050  (xmin, xmax, ymin, ymax)\n#&gt; coord. ref. : SIRGAS 2000 / UTM zone 23S (EPSG:31983) \n#&gt; source(s)   : memory\n#&gt; names       :  zmax,        zmean,         zsd,     zskew,       zkurt,    zentropy, ... \n#&gt; min values  :  0.75,  0.001065319,  0.02499118, -1.860858,    1.127885, 0.005277377, ... \n#&gt; max values  : 34.46, 17.730712824, 12.95950270, 41.207184, 1738.774391, 0.955121240, ...\nplot(metrics, col = height.colors(50))\n\n\n\n\n\n\n\n\n# Plot a specific metric from the predefined set\nplot(metrics, \"zsd\", col = height.colors(50))"
+  },
+  {
+    "objectID": "06_aba.html#advanced-usage-with-user-defined-metrics",
+    "href": "06_aba.html#advanced-usage-with-user-defined-metrics",
+    "title": "Area Based Approach",
+    "section": "Advanced Usage with User-Defined Metrics",
+    "text": "Advanced Usage with User-Defined Metrics\n\n\n\n\n\n\n3rd party metric packages\n\n\n\nlidR provides flexibility for users to define custom metrics. Check out 3rd party packages like lidRmetrics for suites of metrics.\n\n\nWe can also create our own user-defined metric functions. This demonstrates the flexibility of the lidR package!\n\n# Generate a user-defined function to compute biomass\nf &lt;- function(z, dbh) { 0.2*(mean(z)^3) + 0.8*quantile(z, probs = 0.9)*dbh^2 }\n\n# Compute grid metrics for the user-defined function\nX &lt;- pixel_metrics(las = las, func = ~f(z = Z, dbh = 0.4), res = 10)\n\n# Compute grid metrics using the same function, using first returns only\nX &lt;- pixel_metrics(las = filter_first(las), func = ~f(z = Z, dbh = 0.4), res = 10)\n\n# Visualize the output\nplot(X, col = height.colors(50))"
+  },
+  {
+    "objectID": "06_aba.html#case-study-vertical-complexity-index-vci",
+    "href": "06_aba.html#case-study-vertical-complexity-index-vci",
+    "title": "Area Based Approach",
+    "section": "Case Study: Vertical Complexity Index (VCI)",
+    "text": "Case Study: Vertical Complexity Index (VCI)\nLet’s create a user-defined function for a more sophisticated metric. Vertical Complexity Index, or VCI, assesses the “evenness” of the vertical canopy structure using the same information theory as Simpson’s Evenness Index. As the vertical distribution of points becomes more unimodal, VCI approaches one; as the distribution of points becomes multimodal or skewed, VCI approaches zero. This metric was developed by Van Ewijk (2015).\n\\[VCI = (-\\sum_{i=1}^{HB}[p_{i}*ln(p_{i}])/ln(HB)\\]\nSteps:\n\nDivide the vertical range of the pixel into a number of height bins HB.\nCompute the proportion p_i of total returns in each height bin i.\nFor each height bin i, multiply the proportion of returns p_i by the natural log of the proportion of returns ln(p_i).\nTake the sum of these products and multiply by -1.\nDivide the negative sum by the natural log of the number of height bins ln(HB).\n\n\n# Build our function\nf_vci &lt;- function(z, bin.size) {\n## Step 1: Specify the breakpoints for the bins.\nbrks &lt;- seq(0, ceiling(max(z)), by = bin.size)\nbrks\n## Step 2: Get the number of returns in each bin and divide by the total number of returns to get the proportion\nz_counts &lt;- hist(z, breaks = brks, plot = F)$counts\nz_counts\nz_prop &lt;- z_counts / sum(z_counts)\nz_prop\n## Step 3: Compute the product of the proportion and the log of proportion using some simple vector algebra\nz_products &lt;- z_prop * log(z_prop)\nz_products\n## Step 4: Take the sum of the products and multiply by -1\nsum_term &lt;- sum(z_products) * -1\nsum_term\n## Step 5: Divide the negative sum by the natural log of the number of height bins\nhb &lt;- length(brks) - 1\nhb\nvci &lt;- sum_term/log(hb)\nvci\n## Return the VCI\nreturn(vci)\n}\n\n# Try out our new formula\nVCI &lt;- pixel_metrics(las = las, res = 10, func = ~f_vci(z = Z, bin.size = 1))\nplot(VCI)\n\n\n\n\n\n\n\n\n# Try it again, but use only first returns\nVCI &lt;- pixel_metrics(las = filter_first(las), res = 10, func = ~f_vci(Z))\nplot(VCI)"
+  },
+  {
+    "objectID": "06_aba.html#exercises-and-questions",
+    "href": "06_aba.html#exercises-and-questions",
+    "title": "Area Based Approach",
+    "section": "Exercises and Questions",
+    "text": "Exercises and Questions\nUsing:\nlas &lt;- readLAS(\"data/MixedEucaNat_normalized.laz\", select = \"*\",  filter = \"-set_withheld_flag 0\")\n\nE1.\nUsing only first returns, calculate the difference between the mean height and 75th height percentile at a 10 m resolution. Plot both the raster output and the original point cloud and compare the trees where the difference is higher vs lower. What differences do you notice?\n\n\nE2.\nMap the density of ground returns at a 5 m resolution with pixel_metrics(filter = ~Classification == LASGROUND).\n\n\nE3.\nMap pixels that are flat (planar) using stdshapemetrics. These could indicate potential roads."
+  },
+  {
+    "objectID": "06_aba.html#conclusion",
+    "href": "06_aba.html#conclusion",
+    "title": "Area Based Approach",
+    "section": "Conclusion",
+    "text": "Conclusion\nIn this tutorial, we covered basic usage of the lidR package for computing mean and max heights within grid cells and using predefined sets of metrics. Additionally, we explored the advanced usage with the ability to define user-specific metrics for grid computation."
+  },
+  {
+    "objectID": "03_dtm.html",
+    "href": "03_dtm.html",
+    "title": "Digital Terrain Models",
+    "section": "",
+    "text": "Code\nlidRbook section"
+  },
+  {
+    "objectID": "03_dtm.html#relevant-resources",
+    "href": "03_dtm.html#relevant-resources",
+    "title": "Digital Terrain Models",
+    "section": "",
+    "text": "Code\nlidRbook section"
+  },
+  {
+    "objectID": "03_dtm.html#overview",
+    "href": "03_dtm.html#overview",
+    "title": "Digital Terrain Models",
+    "section": "Overview",
+    "text": "Overview\nThis tutorial explores the creation of a Digital Terrain Model (DTM) from LiDAR data. It demonstrates two algorithms for DTM generation: ground point triangulation, and inverse-distance weighting. Additionally, the tutorial showcases DTM-based normalization and point-based normalization, accompanied by exercises for hands-on practice."
+  },
+  {
+    "objectID": "03_dtm.html#environment",
+    "href": "03_dtm.html#environment",
+    "title": "Digital Terrain Models",
+    "section": "Environment",
+    "text": "Environment\n\n# Clear environment\nrm(list = ls(globalenv()))\n\n# Load packages\nlibrary(lidR)"
+  },
+  {
+    "objectID": "03_dtm.html#dtm-digital-terrain-model",
+    "href": "03_dtm.html#dtm-digital-terrain-model",
+    "title": "Digital Terrain Models",
+    "section": "DTM (Digital Terrain Model)",
+    "text": "DTM (Digital Terrain Model)\nIn this section, we’ll generate a Digital Terrain Model (DTM) from LiDAR data using two different algorithms: tin() and knnidw().\n\nData Preprocessing\n\n# Load LiDAR data and filter out non-ground points\nlas &lt;- readLAS(files = \"data/MixedEucaNat.laz\", filter = \"-set_withheld_flag 0\")\n\nHere, we load the LiDAR data and exclude points flagged as withheld.\n\n\nVisualizing LiDAR Data\nWe start by visualizing the entire LiDAR point cloud to get an initial overview.\nplot(las)\n\n\n\n\n\n\n\n\n\nVisualizing the LiDAR data again, this time to distinguish ground points (blue) more effectively.\nplot(las, color = \"Classification\")\n\n\n\n\n\n\n\n\n\n\n\nTriangulation Algorithm - tin()\nWe create a DTM using the tin() algorithm with a resolution of 1 meter.\n\n# Generate a DTM using the TIN (Triangulated Irregular Network) algorithm\ndtm_tin &lt;- rasterize_terrain(las = las, res = 1, algorithm = tin())\n\n\n\n\n\n\n\nDegenerated points\n\n\n\nA degenerated point in LiDAR data refers to a point with identical XY(Z) coordinates as another point. This means two or more points occupy exactly the same location in XY/3D space. Degenerated points can cause issues in tasks like creating a digital terrain model, as they don’t add new information and can lead to inconsistencies. Identifying and handling degenerated points appropriately is crucial for accurate and meaningful results.\n\n\n\n\nVisualizing DTM in 3D\nTo better conceptualize the terrain, we visualize the generated DTM in a 3D plot.\n# Visualize the DTM in 3D\nplot_dtm3d(dtm_tin)\n\n\n\n\n\n\n\n\n\n\n\nVisualizing DTM with LiDAR Data\nWe overlay the DTM on the LiDAR data (non-ground points only) for a more comprehensive view of the terrain.\n# Filter for non-ground points to show dtm better\nlas_ng &lt;- filter_poi(las = las, Classification != 2L)\n\n# Visualize the LiDAR data with the overlaid DTM in 3D\nx &lt;- plot(las_ng, bg = \"white\")\nadd_dtm3d(x, dtm_tin, bg = \"white\")\n\n\n\n\n\n\n\n\n\n\n\nInverse-Distance Weighting (IDW) Algorithm - knnidw()\nNext, we generate a DTM using the IDW algorithm to compare results with the TIN-based DTM.\n\n# Generate a DTM using the IDW (Inverse-Distance Weighting) algorithm\ndtm_idw &lt;- rasterize_terrain(las = las, res = 1, algorithm = knnidw())\n\n\n\nVisualizing IDW-based DTM in 3D\nWe visualize the DTM generated using the IDW algorithm in a 3D plot.\n# Visualize the IDW-based DTM in 3D\nplot_dtm3d(dtm_idw)"
+  },
+  {
+    "objectID": "03_dtm.html#normalization",
+    "href": "03_dtm.html#normalization",
+    "title": "Digital Terrain Models",
+    "section": "Normalization",
+    "text": "Normalization\nWe’ll focus on height normalization of LiDAR data using both DTM-based and point-based normalization methods.\n\nDTM-based Normalization\nWe perform DTM-based normalization on the LiDAR data using the previously generated DTM.\n\n# Normalize the LiDAR data using DTM-based normalization\nnlas_dtm &lt;- normalize_height(las = las, algorithm = dtm_tin)\n\n\n\nVisualizing Normalized LiDAR Data\nWe visualize the normalized LiDAR data, illustrating heights relative to the DTM.\n# Visualize the normalized LiDAR data\nplot(nlas_dtm)\n\n\n\n\n\n\n\n\n\n\n\nFiltering Ground Points\nWe filter the normalized data to keep only the ground points.\n\n# Filter the normalized data to retain only ground points\ngnd_dtm &lt;- filter_ground(las = nlas_dtm)\n\n\n\nVisualizing Filtered Ground Points\nWe visualize the filtered ground points, focusing on the terrain after normalization.\n# Visualize the filtered ground points\nplot(gnd_dtm)\n\n\n\n\n\n\n\n\n\n\n\nHistogram of Normalized Ground Points\nA histogram helps us understand the distribution of normalized ground points’ height.\n\n# Plot the histogram of normalized ground points' height\nhist(gnd_dtm$Z, breaks = seq(-1.5, 1.5, 0.05))\n\n\n\n\n\n\n\n\n\n\nDTM-based Normalization with TIN Algorithm\nWe perform DTM-based normalization on the LiDAR data using the TIN algorithm.\n\n# Normalize the LiDAR data using DTM-based normalization with TIN algorithm\nnlas_tin &lt;- normalize_height(las = las, algorithm = tin())\n\n\n\nVisualizing Normalized LiDAR Data with TIN\nWe visualize the normalized LiDAR data using the TIN algorithm, showing heights relative to the DTM.\n\n# Visualize the normalized LiDAR data using the TIN algorithm\nplot(nlas_tin, bg = \"white\")\n\n\n\nFiltering Ground Points (TIN-based)\nWe filter the normalized data (TIN-based) to keep only the ground points.\n\n# Filter the normalized data (TIN-based) to retain only ground points\ngnd_tin &lt;- filter_ground(las = nlas_tin)\n\n\n\nVisualizing Filtered Ground Points (TIN-based)\nWe visualize the filtered ground points after TIN-based normalization, focusing on the terrain.\n# Visualize the filtered ground points after TIN-based normalization\nplot(gnd_tin)\n\n\n\n\n\n\n\n\n\n\n\nHistogram of Normalized Ground Points (TIN-based)\nA histogram illustrates the distribution of normalized ground points’ height after TIN-based normalization.\n\n# Plot the histogram of normalized ground points' height after TIN-based normalization\nhist(gnd_tin$Z, breaks = seq(-1.5, 1.5, 0.05))"
+  },
+  {
+    "objectID": "03_dtm.html#exercises",
+    "href": "03_dtm.html#exercises",
+    "title": "Digital Terrain Models",
+    "section": "Exercises",
+    "text": "Exercises\n\nE1.\nPlot and compare these two normalized point-clouds. Why do they look different? Fix that. Hint: filter.\n# Load and visualize nlas1 and nlas2\nlas1 = readLAS(\"data/MixedEucaNat.laz\", filter = \"-set_withheld_flag 0\")\nnlas1 = normalize_height(las1, tin())\nnlas2 = readLAS(\"data/MixedEucaNat_normalized.laz\", filter = \"-set_withheld_flag 0\")\nplot(nlas1)\nplot(nlas2)\n\n\nE2.\nClip a plot somewhere in MixedEucaNat.laz (the non-normalized file).\n\n\nE3.\nCompute a DTM for this plot. Which method are you choosing and why?\n\n\nE4.\nCompute a DSM (digital surface model). Hint: Look back to how you made a CHM.\n\n\nE5.\nNormalize the plot.\n\n\nE6.\nCompute a CHM.\n\n\nE7.\nCompute some metrics of interest in this plot with cloud_metrics()."
+  },
+  {
+    "objectID": "03_dtm.html#conclusion",
+    "href": "03_dtm.html#conclusion",
+    "title": "Digital Terrain Models",
+    "section": "Conclusion",
+    "text": "Conclusion\nThis tutorial covered the creation of Digital Terrain Models (DTMs) from LiDAR data using different algorithms and explored height normalization techniques. The exercises provided hands-on opportunities to apply these concepts, enhancing understanding and practical skills."
+  },
+  {
+    "objectID": "05_its.html",
+    "href": "05_its.html",
+    "title": "Individual Tree Detection & Segmentation",
+    "section": "",
+    "text": "Code\nlidRbook section"
+  },
+  {
+    "objectID": "05_its.html#relevant-resources",
+    "href": "05_its.html#relevant-resources",
+    "title": "Individual Tree Detection & Segmentation",
+    "section": "",
+    "text": "Code\nlidRbook section"
+  },
+  {
+    "objectID": "05_its.html#overview",
+    "href": "05_its.html#overview",
+    "title": "Individual Tree Detection & Segmentation",
+    "section": "Overview",
+    "text": "Overview\nThis code demonstrates individual tree segmentation (ITS) using LiDAR data. It covers CHM-based and point cloud-based methods for tree detection and segmentation. The code also shows how to extract metrics at the tree level and visualize them."
+  },
+  {
+    "objectID": "05_its.html#environment",
+    "href": "05_its.html#environment",
+    "title": "Individual Tree Detection & Segmentation",
+    "section": "Environment",
+    "text": "Environment\n\n# Clear environment\nrm(list = ls(globalenv()))\n\n# Load packages\nlibrary(lidR)\nlibrary(sf)\nlibrary(terra)\n\n# Read in LiDAR file and set some color palettes\nlas &lt;- readLAS(\"data/MixedEucaNat_normalized.laz\",  filter = \"-set_withheld_flag 0\")\ncol &lt;- height.colors(50)\ncol1 &lt;- pastel.colors(900)"
+  },
+  {
+    "objectID": "05_its.html#chm-based-methods",
+    "href": "05_its.html#chm-based-methods",
+    "title": "Individual Tree Detection & Segmentation",
+    "section": "CHM based methods",
+    "text": "CHM based methods\nWe start by creating a Canopy Height Model (CHM) from the LiDAR data. The rasterize_canopy() function generates the CHM using a specified resolution (res) and a chosen algorithm, here p2r(0.15), to compute the percentiles.\n\n# Generate CHM\nchm &lt;- rasterize_canopy(las = las, res = 0.5, algorithm = p2r(0.15))\nplot(chm, col = col)\n\n\n\n\n\n\n\n\nAfter building the CHM, we visualize it using a color palette (col)."
+  },
+  {
+    "objectID": "05_its.html#optionally-smooth-the-chm",
+    "href": "05_its.html#optionally-smooth-the-chm",
+    "title": "Individual Tree Detection & Segmentation",
+    "section": "Optionally smooth the CHM",
+    "text": "Optionally smooth the CHM\nOptionally, we can smooth the CHM using a kernel to remove small-scale variations and enhance larger features like tree canopies.\n\n# Generate kernel and smooth chm\nkernel &lt;- matrix(1, 3, 3)\nschm &lt;- terra::focal(x = chm, w = kernel, fun = median, na.rm = TRUE)\nplot(schm, col = col)\n\n\n\n\n\n\n\n\nHere, we smooth the CHM using a median filter with a 3x3 kernel. The smoothed CHM (schm) is visualized using a color palette to represent height values."
+  },
+  {
+    "objectID": "05_its.html#tree-detection",
+    "href": "05_its.html#tree-detection",
+    "title": "Individual Tree Detection & Segmentation",
+    "section": "Tree detection",
+    "text": "Tree detection\nNext, we detect tree tops using the smoothed CHM. The locate_trees() function identifies tree tops based on local maxima.\n\n# Detect trees\nttops &lt;- locate_trees(las = schm, algorithm = lmf(ws = 2.5))\nttops\n#&gt; Simple feature collection with 935 features and 2 fields\n#&gt; Attribute-geometry relationships: constant (2)\n#&gt; Geometry type: POINT\n#&gt; Dimension:     XYZ\n#&gt; Bounding box:  xmin: 203830.2 ymin: 7358900 xmax: 203979.8 ymax: 7359050\n#&gt; Projected CRS: SIRGAS 2000 / UTM zone 23S\n#&gt; First 10 features:\n#&gt;    treeID      Z                       geometry\n#&gt; 1       1  5.230 POINT Z (203878.8 7359050 5...\n#&gt; 2       2  3.900 POINT Z (203889.8 7359050 3.9)\n#&gt; 3       3  7.360 POINT Z (203898.8 7359050 7...\n#&gt; 4       4 17.790 POINT Z (203905.8 7359050 1...\n#&gt; 5       5 11.940 POINT Z (203935.8 7359050 1...\n#&gt; 6       6  3.275 POINT Z (203939.2 7359050 3...\n#&gt; 7       7 21.550 POINT Z (203951.8 7359050 2...\n#&gt; 8       8 17.290 POINT Z (203963.8 7359050 1...\n#&gt; 9       9 21.085 POINT Z (203977.2 7359050 2...\n#&gt; 10     10 19.220 POINT Z (203914.8 7359049 1...\nplot(chm, col = col)\nplot(ttops, col = \"black\", add = TRUE, cex = 0.5)\n\n\n\n\n\n\n\n\nThe detected tree tops (ttops) are plotted on top of the CHM (chm) to visualize their positions."
+  },
+  {
+    "objectID": "05_its.html#segmentation",
+    "href": "05_its.html#segmentation",
+    "title": "Individual Tree Detection & Segmentation",
+    "section": "Segmentation",
+    "text": "Segmentation\nNow, we perform tree segmentation using the detected tree tops. The segment_trees() function segments the trees in the LiDAR point cloud based on the previously detected tree tops.\n# Segment trees using dalponte\nlas &lt;- segment_trees(las = las, algorithm = dalponte2016(chm = schm, treetops = ttops))\n\n# Count number of trees detected and segmented\nlength(unique(las$treeID) |&gt; na.omit())\n#&gt; [1] 935\n\n# Visualize all trees\nplot(las, color = \"treeID\")\n\n\n\n\n\n\n\n\n\n\n# Select trees by ID\ntree25 &lt;- filter_poi(las = las, treeID == 25)\ntree125 &lt;- filter_poi(las = las, treeID == 125)\n\nplot(tree25, size = 4)\n\n\n\n\n\n\n\n\n\nplot(tree125, size = 3)\n\n\n\n\n\n\n\n\n\nAfter segmentation, we count the number of trees detected and visualize all the trees in the point cloud. We then select two trees (tree25 and tree125) and visualize them individually.\n\n\n\n\n\n\nVariability and testing\n\n\n\nForests are highly variable! This means that some algorithms and parameters will work better than others depending on the data you have. Play around with algorithms and see which works best for your data."
+  },
+  {
+    "objectID": "05_its.html#working-with-rasters",
+    "href": "05_its.html#working-with-rasters",
+    "title": "Individual Tree Detection & Segmentation",
+    "section": "Working with rasters",
+    "text": "Working with rasters\nThe lidR package is designed for point clouds, but some functions can be applied to raster data as well. Here, we show how to extract trees from the CHM without using the point cloud directly.\n\n# Generate rasterized delineation\ntrees &lt;- dalponte2016(chm = chm, treetops = ttops)() # Notice the parenthesis at the end\ntrees\n#&gt; class       : SpatRaster \n#&gt; dimensions  : 300, 300, 1  (nrow, ncol, nlyr)\n#&gt; resolution  : 0.5, 0.5  (x, y)\n#&gt; extent      : 203830, 203980, 7358900, 7359050  (xmin, xmax, ymin, ymax)\n#&gt; coord. ref. : SIRGAS 2000 / UTM zone 23S (EPSG:31983) \n#&gt; source(s)   : memory\n#&gt; name        :   Z \n#&gt; min value   :   1 \n#&gt; max value   : 935\n\nplot(trees, col = col1)\nplot(ttops, add = TRUE, cex = 0.5)\n#&gt; Warning in plot.sf(ttops, add = TRUE, cex = 0.5): ignoring all but the first\n#&gt; attribute\n\n\n\n\n\n\n\n\nWe create tree objects (trees) using the dalponte2016 algorithm with the CHM and tree tops. The resulting objects are visualized alongside the detected tree tops."
+  },
+  {
+    "objectID": "05_its.html#tree-detection-1",
+    "href": "05_its.html#tree-detection-1",
+    "title": "Individual Tree Detection & Segmentation",
+    "section": "Tree detection",
+    "text": "Tree detection\nWe begin with tree detection using the local maxima filtering (lmf) algorithm. This approach directly works with the LiDAR point cloud to detect tree tops.\n\n# Detect trees\nttops &lt;- locate_trees(las = las, algorithm = lmf(ws = 3, hmin = 5))\n\n# Visualize\nx &lt;- plot(las)\nadd_treetops3d(x = x, ttops = ttops, radius = 0.5)\n\n\n\n\n\n\n\n\n\nWe detect tree tops using the lmf algorithm and visualize them in 3D by adding the tree tops to the LiDAR plot."
+  },
+  {
+    "objectID": "05_its.html#tree-segmentation",
+    "href": "05_its.html#tree-segmentation",
+    "title": "Individual Tree Detection & Segmentation",
+    "section": "Tree segmentation",
+    "text": "Tree segmentation\nNext, we perform tree segmentation using the li2012 algorithm, which directly processes the LiDAR point cloud.\n# Segment using li\nlas &lt;- segment_trees(las = las, algorithm = li2012())\nplot(las, color = \"treeID\")\n# This algorithm does not seem pertinent for this dataset.\n\n\n\n\n\n\n\n\n\nThe li2012 algorithm segments the trees in the LiDAR point cloud based on local neighborhood information. However, it may not be optimal for this specific dataset."
+  },
+  {
+    "objectID": "05_its.html#using-crown_metrics",
+    "href": "05_its.html#using-crown_metrics",
+    "title": "Individual Tree Detection & Segmentation",
+    "section": "Using crown_metrics()",
+    "text": "Using crown_metrics()\nThe crown_metrics() function extracts metrics from the segmented trees using a user-defined function. We use the length of the Z coordinate to obtain the tree height as an example.\n\n# Generate metrics for each delineated crown\nmetrics &lt;- crown_metrics(las = las, func = ~list(n = length(Z)))\nmetrics\n#&gt; Simple feature collection with 752 features and 2 fields\n#&gt; Geometry type: POINT\n#&gt; Dimension:     XYZ\n#&gt; Bounding box:  xmin: 203830 ymin: 7358900 xmax: 203980 ymax: 7359050\n#&gt; z_range:       zmin: 2.02 zmax: 34.46\n#&gt; Projected CRS: SIRGAS 2000 / UTM zone 23S\n#&gt; First 10 features:\n#&gt;    treeID    n                       geometry\n#&gt; 1       1 2774 POINT Z (203969.4 7359045 3...\n#&gt; 2       2 1918 POINT Z (203969.5 7358922 3...\n#&gt; 3       3  859 POINT Z (203967.8 7358926 3...\n#&gt; 4       4 1605 POINT Z (203943.1 7358936 3...\n#&gt; 5       5  454 POINT Z (203954.5 7358949 3...\n#&gt; 6       6  417 POINT Z (203957.8 7358949 3...\n#&gt; 7       7  946 POINT Z (203949.7 7358943 3...\n#&gt; 8       8 1671 POINT Z (203970 7358900 32.09)\n#&gt; 9       9 1106 POINT Z (203975.2 7358915 3...\n#&gt; 10     10  411 POINT Z (203947.7 7358949 3...\nplot(metrics[\"n\"], cex = 0.8)\n\n\n\n\n\n\n\n\nWe calculate the number of points (n) in each tree crown using a user-defined function, and then visualize the results."
+  },
+  {
+    "objectID": "05_its.html#applying-user-defined-functions",
+    "href": "05_its.html#applying-user-defined-functions",
+    "title": "Individual Tree Detection & Segmentation",
+    "section": "Applying user-defined functions",
+    "text": "Applying user-defined functions\nWe can map any user-defined function at the tree level using the crown_metrics() function, just like pixel_metrics(). Here, we calculate the convex hull area of each tree using a custom function f() and then visualize the results.\n\n# User defined function for area calculation\nf &lt;- function(x, y) {\n  # Get xy for tree\n  coords &lt;- cbind(x, y)\n  \n  # Convex hull\n  ch &lt;- chull(coords)\n  \n  # Close coordinates\n  ch &lt;- c(ch, ch[1])\n  ch_coords &lt;- coords[ch, ]\n  \n  # Generate polygon\n  p &lt;- sf::st_polygon(list(ch_coords))\n  \n  #calculate area\n  area &lt;- sf::st_area(p)\n\n  return(list(A = area))\n}\n\n# Apply user-defined function\nmetrics &lt;- crown_metrics(las = las, func = ~f(X, Y))\nmetrics\n#&gt; Simple feature collection with 752 features and 2 fields\n#&gt; Geometry type: POINT\n#&gt; Dimension:     XYZ\n#&gt; Bounding box:  xmin: 203830 ymin: 7358900 xmax: 203980 ymax: 7359050\n#&gt; z_range:       zmin: 2.02 zmax: 34.46\n#&gt; Projected CRS: SIRGAS 2000 / UTM zone 23S\n#&gt; First 10 features:\n#&gt;    treeID         A                       geometry\n#&gt; 1       1 172.51720 POINT Z (203969.4 7359045 3...\n#&gt; 2       2 103.84100 POINT Z (203969.5 7358922 3...\n#&gt; 3       3  72.18270 POINT Z (203967.8 7358926 3...\n#&gt; 4       4  79.85055 POINT Z (203943.1 7358936 3...\n#&gt; 5       5  17.34630 POINT Z (203954.5 7358949 3...\n#&gt; 6       6  17.45860 POINT Z (203957.8 7358949 3...\n#&gt; 7       7  41.13120 POINT Z (203949.7 7358943 3...\n#&gt; 8       8  71.97225 POINT Z (203970 7358900 32.09)\n#&gt; 9       9  50.51530 POINT Z (203975.2 7358915 3...\n#&gt; 10     10  24.61015 POINT Z (203947.7 7358949 3...\nplot(metrics[\"A\"], cex = 0.8)\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n3rd party metric packages\n\n\n\nRemember that you can use 3rd party packages like lidRmetrics for crown metrics too!"
+  },
+  {
+    "objectID": "05_its.html#using-pre-defined-metrics",
+    "href": "05_its.html#using-pre-defined-metrics",
+    "title": "Individual Tree Detection & Segmentation",
+    "section": "Using pre-defined metrics",
+    "text": "Using pre-defined metrics\nSome metrics are already recorded, and we can directly calculate them at the tree level using crown_metrics().\n\nmetrics &lt;- crown_metrics(las = las, func = .stdtreemetrics)\nmetrics\n#&gt; Simple feature collection with 752 features and 4 fields\n#&gt; Geometry type: POINT\n#&gt; Dimension:     XYZ\n#&gt; Bounding box:  xmin: 203830 ymin: 7358900 xmax: 203980 ymax: 7359050\n#&gt; z_range:       zmin: 2.02 zmax: 34.46\n#&gt; Projected CRS: SIRGAS 2000 / UTM zone 23S\n#&gt; First 10 features:\n#&gt;    treeID     Z npoints convhull_area                       geometry\n#&gt; 1       1 34.46    2774       172.517 POINT Z (203969.4 7359045 3...\n#&gt; 2       2 32.52    1918       103.841 POINT Z (203969.5 7358922 3...\n#&gt; 3       3 32.46     859        72.183 POINT Z (203967.8 7358926 3...\n#&gt; 4       4 32.35    1605        79.851 POINT Z (203943.1 7358936 3...\n#&gt; 5       5 32.33     454        17.346 POINT Z (203954.5 7358949 3...\n#&gt; 6       6 32.22     417        17.459 POINT Z (203957.8 7358949 3...\n#&gt; 7       7 32.14     946        41.131 POINT Z (203949.7 7358943 3...\n#&gt; 8       8 32.09    1671        71.972 POINT Z (203970 7358900 32.09)\n#&gt; 9       9 32.08    1106        50.515 POINT Z (203975.2 7358915 3...\n#&gt; 10     10 32.01     411        24.610 POINT Z (203947.7 7358949 3...\n\n# Visualize individual metrics\nplot(x = metrics[\"convhull_area\"], cex = 0.8)\n\n\n\n\n\n\n\nplot(x = metrics[\"Z\"], cex = 0.8)\n\n\n\n\n\n\n\n\nWe calculate tree-level metrics using .stdtreemetrics and visualize individual metrics like convex hull area and height."
+  },
+  {
+    "objectID": "05_its.html#delineating-crowns",
+    "href": "05_its.html#delineating-crowns",
+    "title": "Individual Tree Detection & Segmentation",
+    "section": "Delineating crowns",
+    "text": "Delineating crowns\nThe crown_metrics() function segments trees and extracts metrics at the crown level.\n\ncvx_hulls &lt;- crown_metrics(las = las, func = .stdtreemetrics, geom = 'convex')\ncvx_hulls\n#&gt; Simple feature collection with 752 features and 4 fields\n#&gt; Geometry type: POLYGON\n#&gt; Dimension:     XY\n#&gt; Bounding box:  xmin: 203830 ymin: 7358900 xmax: 203980 ymax: 7359050\n#&gt; Projected CRS: SIRGAS 2000 / UTM zone 23S\n#&gt; First 10 features:\n#&gt;    treeID     Z npoints convhull_area                       geometry\n#&gt; 1       1 34.46    2774       172.517 POLYGON ((203977.3 7359044,...\n#&gt; 2       2 32.52    1918       103.841 POLYGON ((203963.7 7358914,...\n#&gt; 3       3 32.46     859        72.183 POLYGON ((203969.1 7358926,...\n#&gt; 4       4 32.35    1605        79.851 POLYGON ((203948 7358933, 2...\n#&gt; 5       5 32.33     454        17.346 POLYGON ((203955.8 7358949,...\n#&gt; 6       6 32.22     417        17.459 POLYGON ((203959.3 7358948,...\n#&gt; 7       7 32.14     946        41.131 POLYGON ((203950.8 7358941,...\n#&gt; 8       8 32.09    1671        71.972 POLYGON ((203975.7 7358902,...\n#&gt; 9       9 32.08    1106        50.515 POLYGON ((203977 7358915, 2...\n#&gt; 10     10 32.01     411        24.610 POLYGON ((203950.3 7358949,...\n\nplot(cvx_hulls)\nplot(ttops, add = TRUE, cex = 0.5)\n#&gt; Warning in plot.sf(ttops, add = TRUE, cex = 0.5): ignoring all but the first\n#&gt; attribute\n\n\n\n\n\n\n\n\n# Visualize individual metrics based on values\nplot(x = cvx_hulls[\"convhull_area\"])\n\n\n\n\n\n\n\nplot(x = cvx_hulls[\"Z\"])\n\n\n\n\n\n\n\n\nWe use crown_metrics() with .stdtreemetrics to segment trees and extract metrics based on crown delineation."
+  },
+  {
+    "objectID": "05_its.html#exercises",
+    "href": "05_its.html#exercises",
+    "title": "Individual Tree Detection & Segmentation",
+    "section": "Exercises",
+    "text": "Exercises"
+  },
+  {
+    "objectID": "05_its.html#conclusion",
+    "href": "05_its.html#conclusion",
+    "title": "Individual Tree Detection & Segmentation",
+    "section": "Conclusion",
+    "text": "Conclusion\nThis concludes the tutorial on various methods for tree detection, segmentation, and extraction of metrics using the lidR package in R."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "lidR: (A workshop for) Airborne LiDAR Data Manipulation and Visualization for Forestry Applications",
+    "section": "",
+    "text": "Presenter: Leanna Stackhouse (UBC)\nAssistants:\n\nHana Travers-Smith (UBC)\nFatemah Gholami (Laval)\nClaire Armour (CFS)"
   }
 ]
